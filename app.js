@@ -5,6 +5,38 @@
 const API_BASE = 'https://api.alquran.cloud/v1';
 const BISMILLAH = 'بِسْمِ اللَّهِ الرَّحْمٰنِ الرَّحِيمِ';
 
+// The "quran-uthmani" edition embeds the Bismillah text inside ayah 1 of
+// every surah (except At-Tawbah). Since we show Bismillah separately as a
+// heading, we fetch the exact string once and strip it from ayah 1 to
+// avoid showing it twice.
+let BISMILLAH_TEXT = BISMILLAH;
+let bismillahFetched = false;
+async function ensureBismillah(){
+  if(bismillahFetched) return;
+  try{
+    const res = await fetch(`${API_BASE}/ayah/1/quran-uthmani`);
+    const json = await res.json();
+    if(json && json.data && json.data.text){
+      BISMILLAH_TEXT = json.data.text.trim();
+    }
+  }catch(e){ /* keep fallback */ }
+  bismillahFetched = true;
+}
+function stripBismillah(text){
+  const t = text.trim();
+  if(t.startsWith(BISMILLAH_TEXT)){
+    return t.slice(BISMILLAH_TEXT.length).trim();
+  }
+  return text;
+}
+function ayahArabicText(a, surahNum){
+  if(a.numberInSurah === 1 && surahNum !== 1 && surahNum !== 9){
+    const stripped = stripBismillah(a.text);
+    if(stripped !== a.text.trim()) return stripped;
+  }
+  return a.text;
+}
+
 const els = {
   surahGrid: document.getElementById('surahGrid'),
   juzGrid: document.getElementById('juzGrid'),
@@ -30,6 +62,7 @@ const els = {
   sizeInc: document.getElementById('sizeInc'),
   sizeVal: document.getElementById('sizeVal'),
   toggleTranslation: document.getElementById('toggleTranslation'),
+  fontSelect: document.getElementById('fontSelect'),
   continueWrap: document.getElementById('continueWrap'),
   heroSection: document.getElementById('heroSection'),
 };
@@ -196,6 +229,7 @@ async function openReader(type, num){
   localStorage.setItem('quran_lastread', JSON.stringify({type, num}));
 
   try{
+    await ensureBismillah();
     const endpoint = type === 'surah'
       ? `${API_BASE}/surah/${num}/editions/quran-uthmani,bn.bengali`
       : `${API_BASE}/juz/${num}/editions/quran-uthmani,bn.bengali`;
@@ -223,10 +257,11 @@ function renderAyahs(arAyahs, bnAyahs, type, num){
 
   if(type === 'surah'){
     if(num !== 1 && num !== 9){
-      html += `<div class="bismillah">${BISMILLAH}</div>`;
+      html += `<div class="bismillah">${BISMILLAH_TEXT}</div>`;
     }
     for(let i=0;i<arAyahs.length;i++){
-      html += ayahHTML(arAyahs[i], bnAyahs[i], arAyahs[i].numberInSurah);
+      const text = ayahArabicText(arAyahs[i], num);
+      html += ayahHTML(text, bnAyahs[i], arAyahs[i].numberInSurah);
     }
   } else {
     let lastSurah = null;
@@ -239,22 +274,23 @@ function renderAyahs(arAyahs, bnAyahs, type, num){
             <div style="font-family:var(--display); font-size:15px; color:var(--text); margin-bottom:10px; letter-spacing:.5px;">
               সূরা ${info[3]} <span style="color:var(--muted); font-family:var(--bangla);">— ${info[2]}</span>
             </div>
-            ${(sNum !== 1 && sNum !== 9 && a.numberInSurah === 1) ? BISMILLAH : ''}
+            ${(sNum !== 1 && sNum !== 9 && a.numberInSurah === 1) ? BISMILLAH_TEXT : ''}
           </div>`;
         lastSurah = sNum;
       }
-      html += ayahHTML(a, bnAyahs[i], a.numberInSurah);
+      const text = ayahArabicText(a, sNum);
+      html += ayahHTML(text, bnAyahs[i], a.numberInSurah);
     }
   }
 
   els.readerBody.innerHTML = html;
 }
 
-function ayahHTML(arAyah, bnAyah, displayNum){
+function ayahHTML(arText, bnAyah, displayNum){
   return `<div class="ayah">
     <div class="num">${toBn(displayNum)}</div>
     <div class="content">
-      <div class="ar">${arAyah.text}</div>
+      <div class="ar">${arText}</div>
       <div class="bn">${bnAyah ? bnAyah.text : ''}</div>
     </div>
   </div>`;
@@ -303,12 +339,22 @@ function renderContinue(){
    ========================================================= */
 let fontSize = parseInt(localStorage.getItem('quran_fontsize')) || 26;
 let showTranslation = localStorage.getItem('quran_translation') !== 'off';
+let arabicFont = localStorage.getItem('quran_font') || 'amiri';
+
+const FONT_STACKS = {
+  amiri: `'Amiri Quran','Amiri',serif`,
+  scheherazade: `'Scheherazade New','Amiri',serif`,
+  naskh: `'Noto Naskh Arabic','Amiri',serif`,
+  lateef: `'Lateef','Amiri',serif`,
+};
 
 function applySettings(){
   els.readerBody.style.setProperty('--ar-size', fontSize+'px');
   els.readerBody.style.setProperty('--bn-display', showTranslation ? 'block' : 'none');
+  document.documentElement.style.setProperty('--quran-font', FONT_STACKS[arabicFont] || FONT_STACKS.amiri);
   els.sizeVal.textContent = fontSize;
   els.toggleTranslation.checked = showTranslation;
+  els.fontSelect.value = arabicFont;
 }
 
 els.settingsBtn.addEventListener('click', () => els.settingsPanel.classList.add('open'));
@@ -328,6 +374,11 @@ els.sizeDec.addEventListener('click', () => {
 els.toggleTranslation.addEventListener('change', (e) => {
   showTranslation = e.target.checked;
   localStorage.setItem('quran_translation', showTranslation ? 'on' : 'off');
+  applySettings();
+});
+els.fontSelect.addEventListener('change', (e) => {
+  arabicFont = e.target.value;
+  localStorage.setItem('quran_font', arabicFont);
   applySettings();
 });
 
