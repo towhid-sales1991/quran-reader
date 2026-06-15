@@ -61,6 +61,10 @@ const els = {
   sizeDec: document.getElementById('sizeDec'),
   sizeInc: document.getElementById('sizeInc'),
   sizeVal: document.getElementById('sizeVal'),
+  bnSizeDec: document.getElementById('bnSizeDec'),
+  bnSizeInc: document.getElementById('bnSizeInc'),
+  bnSizeVal: document.getElementById('bnSizeVal'),
+  themeSwatches: document.querySelectorAll('.swatch'),
   toggleTranslation: document.getElementById('toggleTranslation'),
   fontSelect: document.getElementById('fontSelect'),
   continueWrap: document.getElementById('continueWrap'),
@@ -230,14 +234,15 @@ async function openReader(type, num){
 
   try{
     await ensureBismillah();
-    const endpoint = type === 'surah'
-      ? `${API_BASE}/surah/${num}/editions/quran-uthmani,bn.bengali`
-      : `${API_BASE}/juz/${num}/editions/quran-uthmani,bn.bengali`;
-    const res = await fetch(endpoint);
-    if(!res.ok) throw new Error('Network response was not ok');
-    const json = await res.json();
-    const [arEdition, bnEdition] = json.data;
-    renderAyahs(arEdition.ayahs, bnEdition.ayahs, type, num);
+    const [arRes, bnRes] = await Promise.all([
+      fetch(`${API_BASE}/${type}/${num}/quran-uthmani`),
+      fetch(`${API_BASE}/${type}/${num}/bn.bengali`)
+    ]);
+    if(!arRes.ok || !bnRes.ok) throw new Error('Network response was not ok');
+    const [arJson, bnJson] = await Promise.all([arRes.json(), bnRes.json()]);
+    const arAyahs = arJson.data.ayahs;
+    const bnAyahs = bnJson.data.ayahs;
+    renderAyahs(arAyahs, bnAyahs, type, num);
   }catch(err){
     els.readerBody.innerHTML = `
       <div class="empty">
@@ -337,9 +342,11 @@ function renderContinue(){
 /* =========================================================
    SETTINGS PANEL
    ========================================================= */
-let fontSize = parseInt(localStorage.getItem('quran_fontsize')) || 26;
+let fontSize = parseInt(localStorage.getItem('quran_fontsize')) || 32;
+let bnFontSize = parseInt(localStorage.getItem('quran_bnfontsize')) || 19;
 let showTranslation = localStorage.getItem('quran_translation') !== 'off';
 let arabicFont = localStorage.getItem('quran_font') || 'amiri';
+let theme = localStorage.getItem('quran_theme') || 'black';
 
 const FONT_STACKS = {
   amiri: `'Amiri Quran','Amiri',serif`,
@@ -350,11 +357,15 @@ const FONT_STACKS = {
 
 function applySettings(){
   els.readerBody.style.setProperty('--ar-size', fontSize+'px');
+  els.readerBody.style.setProperty('--bn-size', bnFontSize+'px');
   els.readerBody.style.setProperty('--bn-display', showTranslation ? 'block' : 'none');
   document.documentElement.style.setProperty('--quran-font', FONT_STACKS[arabicFont] || FONT_STACKS.amiri);
+  document.documentElement.setAttribute('data-theme', theme);
   els.sizeVal.textContent = fontSize;
+  els.bnSizeVal.textContent = bnFontSize;
   els.toggleTranslation.checked = showTranslation;
   els.fontSelect.value = arabicFont;
+  els.themeSwatches.forEach(b => b.classList.toggle('active', b.dataset.theme === theme));
 }
 
 els.settingsBtn.addEventListener('click', () => els.settingsPanel.classList.add('open'));
@@ -362,14 +373,31 @@ els.closeSettings.addEventListener('click', () => els.settingsPanel.classList.re
 els.settingsPanel.addEventListener('click', (e) => { if(e.target === els.settingsPanel) els.settingsPanel.classList.remove('open'); });
 
 els.sizeInc.addEventListener('click', () => {
-  fontSize = Math.min(44, fontSize+2);
+  fontSize = Math.min(54, fontSize+2);
   localStorage.setItem('quran_fontsize', fontSize);
   applySettings();
 });
 els.sizeDec.addEventListener('click', () => {
-  fontSize = Math.max(18, fontSize-2);
+  fontSize = Math.max(20, fontSize-2);
   localStorage.setItem('quran_fontsize', fontSize);
   applySettings();
+});
+els.bnSizeInc.addEventListener('click', () => {
+  bnFontSize = Math.min(30, bnFontSize+1);
+  localStorage.setItem('quran_bnfontsize', bnFontSize);
+  applySettings();
+});
+els.bnSizeDec.addEventListener('click', () => {
+  bnFontSize = Math.max(14, bnFontSize-1);
+  localStorage.setItem('quran_bnfontsize', bnFontSize);
+  applySettings();
+});
+els.themeSwatches.forEach(btn => {
+  btn.addEventListener('click', () => {
+    theme = btn.dataset.theme;
+    localStorage.setItem('quran_theme', theme);
+    applySettings();
+  });
 });
 els.toggleTranslation.addEventListener('change', (e) => {
   showTranslation = e.target.checked;
