@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>আল-কুরআন | Al-Quran — সূরা ও পারা অনুযায়ী পড়ুন</title>
+<meta name="description" content="সূরা ও পারা অনুসারে পবিত্র আল-কুরআনের আরবি পাঠ ও বাংলা অনুবাদ পড়ুন। মোবাইল ও ডেস্কটপ উপযোগী আধুনিক ডিজাইন।">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ===================== TOPBAR ===================== -->
+<header class="topbar">
+  <div class="brand" id="brandHome" title="হোমে যান">
+    <div class="mark">ﷲ</div>
+    <div>
+      <div class="name">Al-<span>Quran</span></div>
+      <div class="tag">আল কুরআন</div>
+    </div>
+  </div>
+
+  <div class="search">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    <input type="text" id="searchInput" placeholder="সূরা বা পারা খুঁজুন... (নাম বা নম্বর)">
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-view="surah">সূরা</button>
+    <button class="tab-btn" data-view="juz">পারা</button>
+  </div>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" id="heroSection">
+  <div class="star star-1">
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <rect x="20" y="20" width="60" height="60" rx="6" fill="none" stroke="#d9b568" stroke-width="1"/>
+      <rect x="20" y="20" width="60" height="60" rx="6" fill="none" stroke="#d9b568" stroke-width="1" transform="rotate(45 50 50)"/>
+    </svg>
+  </div>
+  <div class="star star-2">
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <rect x="20" y="20" width="60" height="60" rx="6" fill="none" stroke="#39c997" stroke-width="1"/>
+      <rect x="20" y="20" width="60" height="60" rx="6" fill="none" stroke="#39c997" stroke-width="1" transform="rotate(45 50 50)"/>
+    </svg>
+  </div>
+
+  <div class="eyebrow">القرآن الكريم</div>
+  <h1>الْقُرْآنُ الْكَرِيْمُ</h1>
+  <h2>পবিত্র আল-কুরআন</h2>
+  <p>সূরা বা পারা অনুযায়ী বেছে নিন এবং আরবি মূল পাঠের সাথে বাংলা অনুবাদ একসাথে পড়ুন — মোবাইল ও ডেস্কটপ থেকে সহজে।</p>
+
+  <div class="stats">
+    <div><div class="num">১১৪</div><div class="lbl">সূরা</div></div>
+    <div><div class="num">৩০</div><div class="lbl">পারা</div></div>
+    <div><div class="num">৬২৩৬</div><div class="lbl">আয়াত</div></div>
+  </div>
+
+  <div id="continueWrap" style="margin-top:24px; position:relative; z-index:1;"></div>
+</section>
+
+<!-- ===================== MAIN ===================== -->
+<main class="container">
+
+  <!-- Surah grid -->
+  <section class="view active" id="view-surah">
+    <div class="section-head">
+      <h3>সূরা সমূহ</h3>
+      <span class="count">১১৪ সূরা</span>
+    </div>
+    <div class="grid" id="surahGrid"></div>
+    <div class="empty" id="surahEmpty" style="display:none">
+      <div class="big">لا</div>
+      <h4 style="font-family:var(--display); color:var(--text); margin-bottom:6px;">কোনো সূরা পাওয়া যায়নি</h4>
+      <p>অন্য নাম বা নম্বর দিয়ে খুঁজুন</p>
+    </div>
+  </section>
+
+  <!-- Juz grid -->
+  <section class="view" id="view-juz">
+    <div class="section-head">
+      <h3>পারা সমূহ</h3>
+      <span class="count">৩০ পারা</span>
+    </div>
+    <div class="grid" id="juzGrid"></div>
+    <div class="empty" id="juzEmpty" style="display:none">
+      <div class="big">لا</div>
+      <h4 style="font-family:var(--display); color:var(--text); margin-bottom:6px;">কোনো পারা পাওয়া যায়নি</h4>
+      <p>১ থেকে ৩০ এর মধ্যে নম্বর দিয়ে খুঁজুন</p>
+    </div>
+  </section>
+
+  <!-- Reader -->
+  <section class="view" id="view-reader">
+    <div class="reader-header">
+      <button class="btn-icon" id="backBtn" title="ফিরে যান">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+      </button>
+      <div class="reader-title">
+        <div class="ar" id="readerTitleAr">—</div>
+        <div class="meta" id="readerTitleMeta">—</div>
+      </div>
+      <button class="btn-icon" id="settingsBtn" title="সেটিংস">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+
+    <div class="reader-body" id="readerBody">
+      <div class="loader">
+        <div class="ring"><i></i><i></i></div>
+        <span>লোড হচ্ছে...</span>
+      </div>
+    </div>
+
+    <div class="reader-footer" id="readerFooter" style="display:none;">
+      <div class="nav-card prev" id="navPrev">
+        <div class="lbl">← পূর্ববর্তী</div>
+        <div class="name" id="navPrevName">—</div>
+      </div>
+      <div class="nav-card next" id="navNext">
+        <div class="lbl">পরবর্তী →</div>
+        <div class="name" id="navNextName">—</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ===================== SETTINGS PANEL ===================== -->
+<div class="settings-panel" id="settingsPanel">
+  <div class="settings-card">
+    <h4>
+      পাঠ সেটিংস
+      <button class="btn-icon" id="closeSettings" style="width:32px; height:32px;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </h4>
+
+    <div class="setting-row">
+      <div class="lbl">আরবি লেখার আকার<small>Arabic text size</small></div>
+      <div class="size-ctrl">
+        <button id="sizeDec">−</button>
+        <span id="sizeVal">26</span>
+        <button id="sizeInc">+</button>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <div class="lbl">বাংলা অনুবাদ দেখান<small>Show Bengali translation</small></div>
+      <label class="switch">
+        <input type="checkbox" id="toggleTranslation" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<footer>
+  AL-QURAN READER · ARABIC TEXT &amp; BANGLA TRANSLATION VIA <span>AlQuran Cloud API</span>
+</footer>
+
+<script src="surahs-data.js"></script>
+<script src="juz-data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
