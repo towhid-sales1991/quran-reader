@@ -2,9 +2,19 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>আল-কুরআন | Al-Quran — সূরা ও পারা অনুযায়ী পড়ুন</title>
 <meta name="description" content="সূরা ও পারা অনুসারে পবিত্র আল-কুরআনের আরবি পাঠ ও বাংলা অনুবাদ পড়ুন। মোবাইল ও ডেস্কটপ উপযোগী আধুনিক ডিজাইন।">
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0c1c16">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Al-Quran">
+
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -192,5 +202,12 @@
 <script src="surahs-data.js"></script>
 <script src="juz-data.js"></script>
 <script src="app.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js').catch(() => {});
+    });
+  }
+</script>
 </body>
 </html>
